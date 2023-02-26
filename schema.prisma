@@ -1,0 +1,45 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model parking_lot {
+  id                 Int              @default(autoincrement()) @id
+  name               String           @unique
+  capacity           Int
+  parking_slots      parking_slot[]
+  created_at         DateTime         @default(now())
+  deleted_at         DateTime?
+}
+
+model parking_slot {
+  id                 Int              @default(autoincrement()) @id
+  slot_no            Int              
+  is_allocated       Boolean          @default(false)
+  parking_lot        parking_lot      @relation(fields: [parking_lot_id], references: [id], onDelete: Cascade)
+  parking_lot_id     Int              
+  tickets            ticket[]
+
+  @@unique(fields: [slot_no, parking_lot_id])
+  @@index(fields: [slot_no, parking_lot_id])
+}
+
+model ticket {
+  id                  Int              @default(autoincrement()) @id
+  registration_no     String
+  car_size            CarSize
+  parking_slot        parking_slot     @relation(fields: [parking_slot_id], references: [id], onDelete: Cascade)
+  parking_slot_id     Int       
+  entry_time          DateTime?        
+  exit_time           DateTime?        
+}
+
+enum CarSize {
+  SMALL
+  MEDIUM
+  LARGE
+}

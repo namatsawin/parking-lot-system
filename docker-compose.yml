@@ -1,0 +1,31 @@
+version: '3'
+
+services:
+  app:
+    container_name: app
+    restart: always
+    build: .
+    ports:
+      - '3000:3000' 
+    env_file:
+      - .env
+    depends_on:
+      - db
+    networks:
+      - server
+  db:
+    image: "postgres:latest"
+    hostname: db_host
+    restart: always
+    ports:
+      - '5432:5432' 
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=parking_lots_system
+    networks:
+      - server
+
+networks:
+  server:
+    driver: bridge
